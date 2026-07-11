@@ -5,114 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Birding Quiz</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
-    h1 { color: #2c3e50; text-align: center; }
-    .question { margin-bottom: 20px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px; }
-    button { margin: 5px; padding: 8px 12px; background-color: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background-color: #1f6391; }
-    #quiz img { max-width: 250px; display: block; margin: 20px auto; }
+    body { font-family: Arial, sans-serif; text-align: center; background-color: #eef; }
+    h1 { margin-top: 50px; color: #2c3e50; }
+    img { max-width: 300px; margin: 20px auto; display: block; }
+    a { display: inline-block; margin-top: 30px; padding: 12px 20px; background: #2980b9; color: white; text-decoration: none; border-radius: 5px; }
+    a:hover { background: #1f6391; }
   </style>
 </head>
 <body>
-  <h1>Birding Quiz</h1>
-  <div id="quiz"></div>
-
-  <script>
-    const questions = [
-      "Quan surts a veure ocells, què et mou més?",
-      "Faries més de 200 km per veure una espècie rara?",
-      "Acostumes a observar sempre al mateix lloc?",
-      "El primer que fas quan veus un ocell és agafar la càmera?",
-      "Et pots passar més d’una hora observant un sol ocell?",
-      "Registres les teves observacions a eBird o Ornitho?",
-      "T’agrada parar-te a sentir l’entorn abans de buscar ocells?",
-      "Si surt una espècie rara, ho deixaries tot per anar-hi?",
-      "Planifiques viatges pensant en ocells?",
-      "Tot i no sortir gaire, tens coneixement d’ocells?",
-      "Prefereixes una bona foto abans que observar amb prismàtics?",
-      "Surts a observar ocells de forma regular?",
-      "T’agrada escriure o compartir el que observes?",
-      "Tens alertes o grups per seguir observacions?",
-      "Pots estar fent una altra cosa i detectar ocells igualment?",
-      "Quan plou o fa fred, igual surts?",
-      "Et fa il·lusió veure ocells migratoris?",
-      "Prefereixes ocells grans o petits?",
-      "Et motiva més la natura en general o només els ocells?",
-      "Prefereixes observar ocells a qualsevol hora o tens un moment del dia?"
-    ];
-
-    const profiles = {
-      lister: { text: "Ets un Lister! T’obsessiona tenir la llista més llarga i actualitzada.", image: "lister.png" },
-      km0: { text: "Ets Km.0! Fidel al teu lloc de sempre, el teu patch és sagrat.", image: "km0.png" },
-      fotograf: { text: "Ets Fotògraf! El que vols és la foto perfecta, més que la observació.", image: "fotograf.png" },
-      pokemonhunter: { text: "Ets Caçador de Pokémons! Faràs quilòmetres per veure rareses.", image: "pokemonhunter.png" },
-      etoleg: { text: "Ets Etòleg! T’agrada observar amb paciència el comportament dels ocells.", image: "etoleg.png" },
-      viatger: { text: "Ets Viatger! Planifiques vacances pensant en els ocells que hi trobaràs.", image: "viatger.png" },
-      natura: { text: "Connectes amb la natura! L’experiència sensorial és el que et mou.", image: "natura.png" },
-      casual: { text: "Ets Casual! Veus ocells per casualitat mentre fas altres activitats.", image: "casual.png" }
-    };
-
-    let answers = [];
-
-    function renderQuiz() {
-      const quizDiv = document.getElementById("quiz");
-      quizDiv.innerHTML = "";
-      questions.forEach((q, i) => {
-        const div = document.createElement("div");
-        div.className = "question";
-        div.innerHTML = `<p>${q}</p>`;
-        for (let val = 1; val <= 5; val++) {
-          const btn = document.createElement("button");
-          btn.textContent = val;
-          btn.onclick = () => selectAnswer(i, val);
-          div.appendChild(btn);
-        }
-        quizDiv.appendChild(div);
-      });
-      const finishBtn = document.createElement("button");
-      finishBtn.textContent = "Finalitzar quiz";
-      finishBtn.onclick = showResult;
-      quizDiv.appendChild(finishBtn);
-    }
-
-    function selectAnswer(questionIndex, value) {
-      answers[questionIndex] = value;
-    }
-
-    function calculateProfile() {
-      const counts = { lister:0, km0:0, fotograf:0, pokemonhunter:0, etoleg:0, viatger:0, natura:0, casual:0 };
-      if (answers[0] >=4) counts.lister++;
-      if (answers[1] >=4) counts.pokemonhunter++;
-      if (answers[2] >=4) counts.km0++;
-      if (answers[3] >=4) counts.fotograf++;
-      if (answers[4] >=4) counts.etoleg++;
-      if (answers[5] >=4) counts.lister++;
-      if (answers[6] >=4) counts.natura++;
-      if (answers[7] >=4) counts.pokemonhunter++;
-      if (answers[8] >=4) counts.viatger++;
-      if (answers[9] >=4) counts.casual++;
-      if (answers[10] >=4) counts.fotograf++;
-      if (answers[11] >=4) counts.km0++;
-      if (answers[12] >=4) counts.lister++;
-      if (answers[13] >=4) counts.natura++;
-      if (answers[14] >=4) counts.casual++;
-      if (answers[15] >=4) counts.viatger++;
-      if (answers[16] >=4) counts.etoleg++;
-      if (answers[17] >=4) counts.fotograf++;
-      if (answers[18] >=4) counts.natura++;
-      if (answers[19] >=4) counts.casual++;
-      let winner = "casual"; let max = 0;
-      for (const p in counts) { if (counts[p] > max) { max = counts[p]; winner = p; } }
-      return profiles[winner];
-    }
-
-    function showResult() {
-      const quizDiv = document.getElementById("quiz");
-      const profile = calculateProfile();
-      quizDiv.innerHTML = `<h2>${profile.text}</h2><img src="imatges/${profile.image}" alt="${profile.text}">`;
-    }
-
-    window.onload = renderQuiz;
-  </script>
+  <h1>Descobreix quin tipus d'ornitòleg ets</h1>
+  <img src="imatges/portada.png" alt="Portada quiz">
+  <a href="quiz.html">Comença el quiz</a>
 </body>
 </html>

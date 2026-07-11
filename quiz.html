@@ -7,7 +7,7 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
     h1 { color: #2c3e50; text-align: center; }
-    .question { margin-bottom: 20px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px; }
+    .question { margin-bottom: 20px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px; text-align: center; }
     button { margin: 5px; padding: 8px 12px; background-color: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; }
     button:hover { background-color: #1f6391; }
     #quiz img { max-width: 250px; display: block; margin: 20px auto; }
@@ -53,30 +53,30 @@
     };
 
     let answers = [];
+    let currentQuestion = 0;
 
-    function renderQuiz() {
+    function renderQuestion() {
       const quizDiv = document.getElementById("quiz");
       quizDiv.innerHTML = "";
-      questions.forEach((q, i) => {
+      if (currentQuestion < questions.length) {
+        const q = questions[currentQuestion];
         const div = document.createElement("div");
         div.className = "question";
         div.innerHTML = `<p>${q}</p>`;
         for (let val = 1; val <= 5; val++) {
           const btn = document.createElement("button");
           btn.textContent = val;
-          btn.onclick = () => selectAnswer(i, val);
+          btn.onclick = () => {
+            answers[currentQuestion] = val;
+            currentQuestion++;
+            renderQuestion();
+          };
           div.appendChild(btn);
         }
         quizDiv.appendChild(div);
-      });
-      const finishBtn = document.createElement("button");
-      finishBtn.textContent = "Finalitzar quiz";
-      finishBtn.onclick = showResult;
-      quizDiv.appendChild(finishBtn);
-    }
-
-    function selectAnswer(questionIndex, value) {
-      answers[questionIndex] = value;
+      } else {
+        showResult();
+      }
     }
 
     function calculateProfile() {
@@ -112,8 +112,7 @@
       quizDiv.innerHTML = `<h2>${profile.text}</h2><img src="imatges/${profile.image}" alt="${profile.text}">`;
     }
 
-    window.onload = renderQuiz;
+    window.onload = renderQuestion;
   </script>
 </body>
 </html>
-``

@@ -1,118 +1,780 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Birding Quiz</title>
+  <meta charset="UTF-8" />
+  <title>Quin birdwatcher ets?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
-    h1 { color: #2c3e50; text-align: center; }
-    .question { margin-bottom: 20px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px; text-align: center; }
-    button { margin: 5px; padding: 8px 12px; background-color: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background-color: #1f6391; }
-    #quiz img { max-width: 250px; display: block; margin: 20px auto; }
+    :root {
+      --bg: #fdfdfd;
+      --primary: #ff7b2c;
+      --secondary: #2c7bff;
+      --accent: #35c46b;
+      --text: #222;
+      --muted: #777;
+      --card: #ffffff;
+      --border: #e3e3e3;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #ffe0c2 0, #fdfdfd 40%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .app {
+      width: 100%;
+      max-width: 720px;
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.08);
+      padding: 24px 24px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .app::before {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(255,123,44,0.12);
+      top: -60px;
+      right: -60px;
+      z-index: -1;
+    }
+    .app::after {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: rgba(44,123,255,0.12);
+      bottom: -40px;
+      left: -40px;
+      z-index: -1;
+    }
+    header {
+      margin-bottom: 18px;
+    }
+    .title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .title span.emoji {
+      font-size: 1.8rem;
+    }
+    .subtitle {
+      margin-top: 6px;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    .subtitle strong {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+    .progress-wrapper {
+      margin: 14px 0 18px;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #f0f0f0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 999px;
+      transition: width 0.35s ease-out;
+    }
+    .card {
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 18px 16px 16px;
+      background: #ffffff;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(53,196,107,0.12);
+      top: -30px;
+      left: -30px;
+      z-index: -1;
+    }
+    .question-index {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .question-hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .scale {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .scale button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 0;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: #f5f5f5;
+      color: var(--text);
+      transition: all 0.18s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+    .scale button span.small {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .scale button.selected {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    }
+    .scale button.selected span.small {
+      color: rgba(255,255,255,0.85);
+    }
+    .scale button:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: none;
+    }
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      gap: 10px;
+    }
+    .nav-left {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    button.primary {
+      border: none;
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.16);
+      transition: all 0.18s ease-out;
+    }
+    button.primary:disabled {
+      opacity: 0.4;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+    button.primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+    }
+    button.secondary {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 9px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: #fff;
+      color: var(--muted);
+      transition: all 0.18s ease-out;
+    }
+    button.secondary:hover {
+      background: #f7f7f7;
+      color: var(--text);
+    }
+    .footer-note {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: right;
+    }
+    .footer-note span {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+    .hidden {
+      display: none;
+    }
+    .result {
+      margin-top: 8px;
+    }
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .result-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .result-chip {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(44,123,255,0.08);
+      color: var(--secondary);
+      font-weight: 600;
+    }
+    .result-body {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .result-body p {
+      margin-bottom: 8px;
+    }
+    .result-tagline {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .result-image {
+      margin-top: 14px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .restart {
+      margin-top: 16px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .restart button {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: #fff;
+      color: var(--secondary);
+      font-weight: 600;
+      transition: all 0.18s ease-out;
+    }
+    .restart button:hover {
+      background: #f5f5ff;
+    }
+    @media (max-width: 600px) {
+      .app {
+        padding: 18px 16px 22px;
+        border-radius: 16px;
+      }
+      .title {
+        font-size: 1.4rem;
+      }
+      .scale {
+        gap: 6px;
+      }
+      .scale button {
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Birding Quiz</h1>
-  <div id="quiz"></div>
+  <div class="app">
+    <header>
+      <div class="title">
+        <span class="emoji">🦉</span>
+        <span>Quin birdwatcher ets?</span>
+      </div>
+      <p class="subtitle">
+        Un test <strong>gamberro però friendly</strong> per descobrir quin tipus d’ornitofriki portes dins.
+      </p>
+    </header>
+
+    <div class="progress-wrapper">
+      <div class="progress-label">
+        <span id="progress-text">Pregunta 1 de 15</span>
+        <span id="progress-percent">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <main>
+      <div id="question-card" class="card"></div>
+      <div id="result-card" class="card hidden"></div>
+    </main>
+
+    <div class="footer-note">
+      No et preocupis: <span>no hi ha respostes dolentes</span>, només perfils diferents.
+    </div>
+  </div>
 
   <script>
+    // Preguntes (P1–P15) amb text i pista humorística
     const questions = [
-      "Quan surts a veure ocells, què et mou més?",
-      "Faries més de 200 km per veure una espècie rara?",
-      "Acostumes a observar sempre al mateix lloc?",
-      "El primer que fas quan veus un ocell és agafar la càmera?",
-      "Et pots passar més d’una hora observant un sol ocell?",
-      "Registres les teves observacions a eBird o Ornitho?",
-      "T’agrada parar-te a sentir l’entorn abans de buscar ocells?",
-      "Si surt una espècie rara, ho deixaries tot per anar-hi?",
-      "Planifiques viatges pensant en ocells?",
-      "Tot i no sortir gaire, tens coneixement d’ocells?",
-      "Prefereixes una bona foto abans que observar amb prismàtics?",
-      "Surts a observar ocells de forma regular?",
-      "T’agrada escriure o compartir el que observes?",
-      "Tens alertes o grups per seguir observacions?",
-      "Pots estar fent una altra cosa i detectar ocells igualment?",
-      "Quan plou o fa fred, igual surts?",
-      "Et fa il·lusió veure ocells migratoris?",
-      "Prefereixes ocells grans o petits?",
-      "Et motiva més la natura en general o només els ocells?",
-      "Prefereixes observar ocells a qualsevol hora o tens un moment del dia?"
+      {
+        id: "P1",
+        text: "Com d’obsessionat estàs amb tenir la llista d’espècies ben llarga?",
+        hint: "Sigues sincer: si la mallerenga blava no surt, t’emprenyes?",
+      },
+      {
+        id: "P2",
+        text: "Quan algú diu que hi ha una espècie rara a 300 km, què et passa pel cap?",
+        hint: "Pensa en el teu impuls real, no en el que queda bé.",
+      },
+      {
+        id: "P3",
+        text: "Com de fidel ets al teu lloc de sempre per mirar ocells?",
+        hint: "Ets més de ‘local patch’ o de volta al món?",
+      },
+      {
+        id: "P4",
+        text: "Quanta importància té fer la foto perfecta de l’ocell?",
+        hint: "Si no hi ha foto, existeix l’observació?",
+      },
+      {
+        id: "P5",
+        text: "Quanta paciència tens per observar el comportament d’un sol ocell?",
+        hint: "Parlem de minuts… o d’hores?",
+      },
+      {
+        id: "P6",
+        text: "Com de sovint actualitzes les teves llistes a eBird, Ornitho o similars?",
+        hint: "Ets d’entrar-ho tot religiosament o ‘ja ho faré’?",
+      },
+      {
+        id: "P7",
+        text: "Quan surts a mirar ocells, com d’important és per tu la connexió amb la natura?",
+        hint: "Olors, sons, aire… tot el pack zen.",
+      },
+      {
+        id: "P8",
+        text: "Quina probabilitat hi ha que facis molts quilòmetres només per una espècie rara?",
+        hint: "Murcia no és tan lluny… o sí?",
+      },
+      {
+        id: "P9",
+        text: "Com de sovint organitzes vacances pensant en ocells més que en monuments?",
+        hint: "Si surt un monument, és perquè hi ha un ocell davant?",
+      },
+      {
+        id: "P10",
+        text: "Com encaixa mirar ocells dins la teva vida social normal (cine, bar, gimnàs…)?",
+        hint: "És una activitat més o és el centre de tot?",
+      },
+      {
+        id: "P11",
+        text: "Quanta part del teu equip de birding són càmeres, objectius i trastos fotogràfics?",
+        hint: "Ets persona… o trípode amb potes?",
+      },
+      {
+        id: "P12",
+        text: "Com de probable és que estiguis al Camp Nou cridant un gol i alhora mirant ocells?",
+        hint: "Ballesters sobre el cap, ja tu saps.",
+      },
+      {
+        id: "P13",
+        text: "Com de convençut estàs que el teu lloc habitual és tan interessant com qualsevol selva tropical?",
+        hint: "El teu ‘Km.0’ és el centre del món?",
+      },
+      {
+        id: "P14",
+        text: "Com d’enganxat estàs als grups de WhatsApp i notificacions d’espècies rares?",
+        hint: "Cada ping pot ser una nova aventura.",
+      },
+      {
+        id: "P15",
+        text: "Com definiries la teva intensitat general amb el birding?",
+        hint: "És un hobby casual o una religió?",
+      },
     ];
 
-    const profiles = {
-      lister: { text: "Ets un Lister! T’obsessiona tenir la llista més llarga i actualitzada.", image: "lister.png" },
-      km0: { text: "Ets Km.0! Fidel al teu lloc de sempre, el teu patch és sagrat.", image: "km0.png" },
-      fotograf: { text: "Ets Fotògraf! El que vols és la foto perfecta, més que la observació.", image: "fotograf.png" },
-      pokemonhunter: { text: "Ets Caçador de Pokémons! Faràs quilòmetres per veure rareses.", image: "pokemonhunter.png" },
-      etoleg: { text: "Ets Etòleg! T’agrada observar amb paciència el comportament dels ocells.", image: "etoleg.png" },
-      viatger: { text: "Ets Viatger! Planifiques vacances pensant en els ocells que hi trobaràs.", image: "viatger.png" },
-      natura: { text: "Connectes amb la natura! L’experiència sensorial és el que et mou.", image: "natura.png" },
-      casual: { text: "Ets Casual! Veus ocells per casualitat mentre fas altres activitats.", image: "casual.png" }
-    };
+    // Escala 1–5 amb etiquetes
+    const scaleLabels = [
+      { value: 1, label: "1", desc: "Gens" },
+      { value: 2, label: "2", desc: "Poc" },
+      { value: 3, label: "3", desc: "Normal" },
+      { value: 4, label: "4", desc: "Bastant" },
+      { value: 5, label: "5", desc: "Molt" },
+    ];
 
-    let answers = [];
-    let currentQuestion = 0;
+    // Respostes de l’usuari
+    const answers = {};
+
+    let currentIndex = 0;
+
+    const questionCard = document.getElementById("question-card");
+    const resultCard = document.getElementById("result-card");
+    const progressText = document.getElementById("progress-text");
+    const progressPercent = document.getElementById("progress-percent");
+    const progressFill = document.getElementById("progress-fill");
 
     function renderQuestion() {
-      const quizDiv = document.getElementById("quiz");
-      quizDiv.innerHTML = "";
-      if (currentQuestion < questions.length) {
-        const q = questions[currentQuestion];
-        const div = document.createElement("div");
-        div.className = "question";
-        div.innerHTML = `<p>${q}</p>`;
-        for (let val = 1; val <= 5; val++) {
-          const btn = document.createElement("button");
-          btn.textContent = val;
-          btn.onclick = () => {
-            answers[currentQuestion] = val;
-            currentQuestion++;
-            renderQuestion();
-          };
-          div.appendChild(btn);
+      const q = questions[currentIndex];
+      const total = questions.length;
+      const answeredCount = Object.keys(answers).length;
+      const percent = Math.round((answeredCount / total) * 100);
+
+      progressText.textContent = `Pregunta ${currentIndex + 1} de ${total}`;
+      progressPercent.textContent = `${percent}%`;
+      progressFill.style.width = `${percent}%`;
+
+      resultCard.classList.add("hidden");
+      questionCard.classList.remove("hidden");
+      questionCard.innerHTML = "";
+
+      const wrapper = document.createElement("div");
+
+      const idx = document.createElement("div");
+      idx.className = "question-index";
+      idx.textContent = `P${currentIndex + 1}`;
+      wrapper.appendChild(idx);
+
+      const text = document.createElement("div");
+      text.className = "question-text";
+      text.textContent = q.text;
+      wrapper.appendChild(text);
+
+      const hint = document.createElement("div");
+      hint.className = "question-hint";
+      hint.textContent = q.hint;
+      wrapper.appendChild(hint);
+
+      const scale = document.createElement("div");
+      scale.className = "scale";
+
+      scaleLabels.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.value = opt.value;
+        btn.innerHTML = `${opt.label}<span class="small">${opt.desc}</span>`;
+
+        if (answers[q.id] === opt.value) {
+          btn.classList.add("selected");
         }
-        quizDiv.appendChild(div);
-      } else {
-        showResult();
+
+        btn.addEventListener("click", () => {
+          answers[q.id] = opt.value;
+          Array.from(scale.children).forEach((b) => b.classList.remove("selected"));
+          btn.classList.add("selected");
+          updateNavButtons();
+        });
+
+        scale.appendChild(btn);
+      });
+
+      wrapper.appendChild(scale);
+
+      const nav = document.createElement("div");
+      nav.className = "nav";
+
+      const navLeft = document.createElement("div");
+      navLeft.className = "nav-left";
+      navLeft.textContent = "Tria una opció de l’escala (1–5).";
+      nav.appendChild(navLeft);
+
+      const navButtons = document.createElement("div");
+      navButtons.className = "nav-buttons";
+
+      const backBtn = document.createElement("button");
+      backBtn.type = "button";
+      backBtn.className = "secondary";
+      backBtn.textContent = "← Enrere";
+      backBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          renderQuestion();
+        }
+      });
+      navButtons.appendChild(backBtn);
+
+      const nextBtn = document.createElement("button");
+      nextBtn.type = "button";
+      nextBtn.className = "primary";
+      nextBtn.id = "next-btn";
+      nextBtn.textContent = currentIndex === total - 1 ? "Veure resultat →" : "Següent →";
+      nextBtn.disabled = answers[q.id] == null;
+      nextBtn.addEventListener("click", () => {
+        if (answers[q.id] == null) return;
+        if (currentIndex < total - 1) {
+          currentIndex++;
+          renderQuestion();
+        } else {
+          showResult();
+        }
+      });
+      navButtons.appendChild(nextBtn);
+
+      nav.appendChild(navButtons);
+      wrapper.appendChild(nav);
+
+      questionCard.appendChild(wrapper);
+    }
+
+    function updateNavButtons() {
+      const nextBtn = document.getElementById("next-btn");
+      if (!nextBtn) return;
+      const q = questions[currentIndex];
+      nextBtn.disabled = answers[q.id] == null;
+    }
+
+    // Càlcul de perfils
+    function computeProfileScores() {
+      const get = (id) => answers[id] || 0;
+
+      const Lister = get("P1") + get("P6");
+      const Pokemon = get("P2") + get("P8") + get("P14");
+      const Km0 = get("P3") + get("P13");
+      const Fotograf = get("P4") + get("P11");
+      const Etolog = get("P5");
+      const Viatger = get("P9");
+      const Natura = get("P7");
+      const Casual = get("P10") + get("P12") + get("P15");
+
+      return { Lister, Pokemon, Km0, Fotograf, Etolog, Viatger, Natura, Casual };
+    }
+
+    function decideProfile(scores) {
+      const entries = Object.entries(scores);
+      entries.sort((a, b) => b[1] - a[1]);
+      const [topKey] = entries[0];
+
+      switch (topKey) {
+        case "Lister": return "Lister";
+        case "Pokemon": return "Caçador de Pokémons";
+        case "Km0": return "Km.0";
+        case "Fotograf": return "Fotògraf";
+        case "Etolog": return "Etòleg";
+        case "Viatger": return "Viatger";
+        case "Natura": return "Connecta amb la natura";
+        case "Casual": return "Casual";
+        default: return "Casual";
       }
     }
 
-    function calculateProfile() {
-      const counts = { lister:0, km0:0, fotograf:0, pokemonhunter:0, etoleg:0, viatger:0, natura:0, casual:0 };
-      if (answers[0] >=4) counts.lister++;
-      if (answers[1] >=4) counts.pokemonhunter++;
-      if (answers[2] >=4) counts.km0++;
-      if (answers[3] >=4) counts.fotograf++;
-      if (answers[4] >=4) counts.etoleg++;
-      if (answers[5] >=4) counts.lister++;
-      if (answers[6] >=4) counts.natura++;
-      if (answers[7] >=4) counts.pokemonhunter++;
-      if (answers[8] >=4) counts.viatger++;
-      if (answers[9] >=4) counts.casual++;
-      if (answers[10] >=4) counts.fotograf++;
-      if (answers[11] >=4) counts.km0++;
-      if (answers[12] >=4) counts.lister++;
-      if (answers[13] >=4) counts.natura++;
-      if (answers[14] >=4) counts.casual++;
-      if (answers[15] >=4) counts.viatger++;
-      if (answers[16] >=4) counts.etoleg++;
-      if (answers[17] >=4) counts.fotograf++;
-      if (answers[18] >=4) counts.natura++;
-      if (answers[19] >=4) counts.casual++;
-      let winner = "casual"; let max = 0;
-      for (const p in counts) { if (counts[p] > max) { max = counts[p]; winner = p; } }
-      return profiles[winner];
+    function getProfileContent(name) {
+      switch (name) {
+        case "Lister":
+          return {
+            title: "Perfil Lister",
+            chip: "Llista llarga, orgull etern",
+            text: [
+              "Vols ser qui la tingui més llarga (la llista). Si no surt la mallerenga blava o no passes de 50 espècies, et cabreges una mica (o molt).",
+              "Ets fidel usuari de fer llistes a eBird o Ornitho, i la teva contribució a la fenologia és d’or.",
+            ],
+            tagline: "La teva vida és una checklist. I t’encanta.",
+            imageNote: "Aquí va la imatge del Lister que ja tens preparada."
+          };
+        case "Km.0":
+          return {
+            title: "Perfil Km.0",
+            chip: "El teu ‘local patch’ és el centre del món",
+            text: [
+              "Sempre mires ocells al mateix lloc, i no et mouen d’allà ni amb una grua.",
+              "Creus que el teu ‘local patch’ està al mateix nivell que la selva amazònica. I, sincerament, potser tens raó.",
+              "Habitualment tens un bloc on expliques tot el que veus. Fas una gran contribució a la fenologia.",
+            ],
+            tagline: "No cal anar lluny per veure coses increïbles.",
+            imageNote: "Aquí va la imatge del Km.0 que ja tens preparada."
+          };
+        case "Fotògraf":
+          return {
+            title: "Perfil Fotògraf",
+            chip: "Si no hi ha foto, no existeix",
+            text: [
+              "Primer apuntes i després preguntes. No saps què són uns prismàtics ni per a què serveixen, perquè el teu món es veu a través d’un objectiu.",
+              "Tot i això, ets eficaç quan es tracta de descobrir que hi ha una espècie rara (i de bimbar en diferit).",
+            ],
+            tagline: "La càmera és una extensió del teu cos.",
+            imageNote: "Aquí va la imatge del Fotògraf que ja tens preparada."
+          };
+        case "Caçador de Pokémons":
+          return {
+            title: "Perfil Caçador de Pokémons",
+            chip: "Rareses, quilòmetres i adrenalina",
+            text: [
+              "Ets capaç de fer molts quilòmetres només perquè s’ha vist una espècie molt rara en un embassament de Múrcia.",
+              "Estàs a tots els grups de WhatsApp coneguts i reps totes les notificacions sobre rareses que apareixen.",
+            ],
+            tagline: "Cada ping al mòbil pot ser una nova aventura.",
+            imageNote: "Aquí va la imatge del Caçador de Pokémons que ja tens preparada."
+          };
+        case "Etòleg":
+          return {
+            title: "Perfil Etòleg",
+            chip: "La paciència feta persona",
+            text: [
+              "No mous ni una pestanya mentre mires un ocell durant una hora i mitja per veure si, quan aixeca el vol, tendeix a volar a la dreta o a l’esquerra.",
+              "Paciència en tens molta (i els teus companys, també). Ets un pou de saviesa sobre comportament.",
+            ],
+            tagline: "Els detalls t’expliquen històries que ningú més veu.",
+            imageNote: "Aquí va la imatge de l’Etòleg que ja tens preparada."
+          };
+        case "Viatger":
+          return {
+            title: "Perfil Viatger",
+            chip: "Vacances amb ocells, no monuments",
+            text: [
+              "Totes les teves vacances les dediques a algun destí turístic on veure ocells.",
+              "No veuràs cap foto de monuments, i si surten, seran darrere d’algun ocellet.",
+              "Per sort, ets bon client de les empreses de turisme de birding.",
+            ],
+            tagline: "El món és gran, i ple d’ocells per descobrir.",
+            imageNote: "Aquí va la imatge del Viatger que ja tens preparada."
+          };
+        case "Connecta amb la natura":
+          return {
+            title: "Perfil Connecta amb la natura",
+            chip: "Nirvana ornitològic",
+            text: [
+              "Abans de mirar amb els prismàtics t’impregnes amb els sons que t’embolcallen, les olors de les fulles, del mar, el Prat…",
+              "Quan observes, no només mires: és una experiència completa.",
+              "I assoleixes el Nirvana!!!!",
+            ],
+            tagline: "Per tu, mirar ocells és una forma de meditació.",
+            imageNote: "Aquí va la imatge de Connecta amb la natura que ja tens preparada."
+          };
+        case "Casual":
+        default:
+          return {
+            title: "Perfil Casual",
+            chip: "Birding com un pla més",
+            text: [
+              "No ets un “forofo”, però en saps. Surts de tant en tant a pardalejar, de la mateixa manera que vas al cine, al bar a fer un beure o al gimnàs.",
+              "Pots estar al Camp Nou i, mentre crides un gol de Lamine Yamal, ets conscient de l’estol de ballesters que xisclen sobre el teu cap.",
+            ],
+            tagline: "El birding encaixa perfectament amb la teva vida quotidiana.",
+            imageNote: "Aquí va la imatge del Casual que ja tens preparada."
+          };
+      }
     }
 
     function showResult() {
-      const quizDiv = document.getElementById("quiz");
-      const profile = calculateProfile();
-      quizDiv.innerHTML = `<h2>${profile.text}</h2><img src="imatges/${profile.image}" alt="${profile.text}">`;
+      const total = questions.length;
+      const answeredCount = Object.keys(answers).length;
+      const percent = Math.round((answeredCount / total) * 100);
+
+      progressText.textContent = "Resultat";
+      progressPercent.textContent = `${percent}%`;
+      progressFill.style.width = "100%";
+
+      const scores = computeProfileScores();
+      const profileName = decideProfile(scores);
+      const content = getProfileContent(profileName);
+
+      questionCard.classList.add("hidden");
+      resultCard.classList.remove("hidden");
+      resultCard.innerHTML = "";
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "result";
+
+      const header = document.createElement("div");
+      header.className = "result-header";
+
+      const title = document.createElement("div");
+      title.className = "result-title";
+      title.textContent = content.title;
+
+      const chip = document.createElement("div");
+      chip.className = "result-chip";
+      chip.textContent = content.chip;
+
+      header.appendChild(title);
+      header.appendChild(chip);
+      wrapper.appendChild(header);
+
+      const body = document.createElement("div");
+      body.className = "result-body";
+      content.text.forEach((t) => {
+        const p = document.createElement("p");
+        p.textContent = t;
+        body.appendChild(p);
+      });
+      wrapper.appendChild(body);
+
+      const tagline = document.createElement("div");
+      tagline.className = "result-tagline";
+      tagline.textContent = content.tagline;
+      wrapper.appendChild(tagline);
+
+      const imageBox = document.createElement("div");
+      imageBox.className = "result-image";
+      imageBox.textContent = content.imageNote;
+      wrapper.appendChild(imageBox);
+
+      const restart = document.createElement("div");
+      restart.className = "restart";
+      const restartBtn = document.createElement("button");
+      restartBtn.type = "button";
+      restartBtn.textContent = "Tornar a començar";
+      restartBtn.addEventListener("click", () => {
+        Object.keys(answers).forEach((k) => delete answers[k]);
+        currentIndex = 0;
+        renderQuestion();
+      });
+      restart.appendChild(restartBtn);
+      wrapper.appendChild(restart);
+
+      resultCard.appendChild(wrapper);
     }
 
-    window.onload = renderQuestion;
+    // Inicialitza
+    renderQuestion();
   </script>
 </body>
 </html>
